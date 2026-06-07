@@ -12,7 +12,7 @@ https://github.com/Scorpion160/Electronic-Development-board
 - `figures/` : vue 3D annotee, photo principale de la carte, image de routage et autres figures.
 - `hardware/easyeda/` : fichiers EasyEDA SCH/PCB.
 - `hardware/gerber/` : Gerber et export 3D/OBJ.
-- `hardware/bom/` : BOM EasyEDA et liste vendeur simplifiee.
+- `hardware/bom/` : BOM EasyEDA et liste des composants.
 - `hardware/pnp/` : fichier Pick and Place.
 - `qr/` : QR code pointant vers le depot GitHub.
 
