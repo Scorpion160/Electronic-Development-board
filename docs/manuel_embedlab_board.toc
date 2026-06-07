@@ -1,0 +1,37 @@
+\babel@toc {french}{}\relax 
+\contentsline {section}{\numberline {1}Presentation generale}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Competences visees}{1}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Vue d'ensemble annotee}{2}{section.2}%
+\contentsline {section}{\numberline {3}Alimentation et securite}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Architecture generale}{3}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Cavalier J10 : regle a retenir}{4}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Connecteurs et cablage}{4}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Headers principaux}{4}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Connecteurs de puissance et broches a reperer}{5}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Modules d'entree}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Boutons BP1 a BP5}{5}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}DIP-switch 6 positions}{6}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Encodeur KY040}{6}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Entrees analogiques : POT1, POT2, LM35 et LDR}{6}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Modules de sortie}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}LEDs simples}{6}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Buzzer}{6}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Affichage}{7}{section.7}%
+\contentsline {subsection}{\numberline {7.1}LCD 1602}{7}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Afficheur 7 segments 4 digits}{7}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Matrice LED 8x8}{7}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Circuits d'extension logique}{7}{section.8}%
+\contentsline {subsection}{\numberline {8.1}74HC595N}{7}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}PCF8574N}{7}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}SN74AHCT125}{7}{subsection.8.3}%
+\contentsline {section}{\numberline {9}Communication USB-serie}{7}{section.9}%
+\contentsline {section}{\numberline {10}Commande de puissance basse tension}{7}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Relais SRD-DC5V-SL-C}{8}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}MOSFET IRFZ44N}{8}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Pont en H}{8}{subsection.10.3}%
+\contentsline {section}{\numberline {11}Procedure de prise en main rapide}{8}{section.11}%
+\contentsline {section}{\numberline {12}Exemples de TP}{8}{section.12}%
+\contentsline {section}{\numberline {13}Depannage rapide}{9}{section.13}%
+\contentsline {section}{\numberline {14}Bonnes pratiques pour les etudiants}{9}{section.14}%
+\contentsline {section}{\numberline {15}Annexe A -- Resume fonctionnel des composants principaux}{9}{section.15}%
+\contentsline {section}{\numberline {16}Annexe B -- Acces aux ressources}{10}{section.16}%
