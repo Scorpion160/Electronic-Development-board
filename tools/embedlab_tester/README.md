@@ -69,9 +69,9 @@ dist\EmbedLab_Board_Tester.exe
 
 ## Commandes série du firmware agent
 
-L'application envoie d'abord un petit firmware agent dans le microcontrôleur. Ensuite, elle communique avec lui par port série. Le microcontrôleur exécute les commandes reçues : allumer une LED, lire un bouton, lire une entrée analogique, générer un son, etc.
+L'application envoie d'abord un petit firmware agent dans le microcontrôleur. Ensuite, elle communique avec lui par port série. Le microcontrôleur exécute les commandes reçues : allumer une LED, lire un bouton, lire une entrée analogique, générer un son, piloter le registre 74HC595N, lancer un test LCD 4 bits ou faire une marche sur plusieurs sorties.
 
-Exemples :
+Commandes de base :
 
 ```text
 PING
@@ -83,6 +83,19 @@ PWM 11 128
 TONE A3 440 500
 I2C_SCAN
 ```
+
+Commandes avancées ajoutées dans l'agent 1.1 :
+
+```text
+SHIFT595 5 6 7 0xAA
+WALK 250 2 3 4 5 6 7 8 9
+LCD4_TEST 2 3 4 5 6 7
+PCF8574_WRITE 0x20 0x55
+PCF8574_WALK 0x20 200
+RESET_OUTPUTS
+```
+
+Ces commandes permettent de commencer l'automatisation des tests pour le 74HC595N, le LCD 1602, le PCF8574N, l'afficheur 7 segments et la matrice LED 8x8. Certains tests restent visuels : l'application lance la séquence et l'utilisateur confirme si l'affichage, le son ou la commutation est correct.
 
 ## Rappel sécurité
 
