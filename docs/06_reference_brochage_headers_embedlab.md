@@ -2,7 +2,7 @@
 
 Cette page reprend les signaux visibles sur la vue rapprochée des connecteurs d'accès aux signaux. Elle sert de base au logiciel **EmbedLab Board Tester** pour guider les câblages de diagnostic.
 
-> Important : la broche de commande du MOSFET n'apparaît pas sur cette vue rapprochée. Elle doit être confirmée depuis le schéma EasyEDA ou le routage complet avant d'être ajoutée définitivement au mapping automatique.
+> Mise à jour : la commande MOSFET est confirmée. Elle se trouve sur le connecteur **J5** et son signal est nommé **MOSFET_Pin**.
 
 ## Header gauche
 
@@ -108,11 +108,17 @@ Cette page reprend les signaux visibles sur la vue rapprochée des connecteurs d
 | 18 | +3V3 |
 | 19 | Relais |
 
-## Points à confirmer
+## Connecteurs séparés / hors vue rapprochée
 
-| Signal | Statut | Action |
+| Connecteur | Signal | Utilisation |
 |---|---|---|
-| Commande MOSFET | Non visible sur la vue rapprochée | Confirmer le nom du pad/header depuis le schéma ou le PCB complet. |
-| PONT_H1 à PONT_H4 | Visible | Définir dans le logiciel si le test utilise 2 ou 4 entrées selon le câblage final du pont en H. |
+| J5 | MOSFET_Pin | Entrée de commande du module MOSFET pour piloter une charge DC externe. |
+
+## Points d'exploitation pour le logiciel de test
+
+| Signal | Statut | Action dans EmbedLab Board Tester |
+|---|---|---|
+| MOSFET_Pin / J5 | Confirmé | Utiliser J5 comme point de câblage côté EmbedLab pour le test MOSFET. |
+| PONT_H1 à PONT_H4 | Visible | Définir si le test utilise 2 ou 4 entrées selon le câblage final du pont en H. |
 | LED1 à LED10 | Visible | Associer LED1..LED9 au chenillard et LED10 au test PWM. |
 | Matrix_R/C | Visible | Utiliser ces noms pour générer les écrans de câblage de la matrice 8x8. |
