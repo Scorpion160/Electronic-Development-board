@@ -67,6 +67,35 @@ Le fichier généré sera placé dans :
 dist\EmbedLab_Board_Tester.exe
 ```
 
+## Téléversement du firmware agent
+
+Le bouton **Téléverser firmware agent** utilise `arduino-cli`. Avant de lancer l'application, vérifier dans PowerShell :
+
+```powershell
+arduino-cli version
+arduino-cli core list
+```
+
+Si le cœur Arduino AVR n'est pas installé :
+
+```powershell
+arduino-cli core update-index
+arduino-cli core install arduino:avr
+```
+
+Si rien ne semblait se passer dans l'ancienne interface, la nouvelle version affiche maintenant :
+
+- un statut visible dans le panneau de gauche ;
+- un message si `arduino-cli` est introuvable ;
+- un journal de compilation/téléversement visible en bas à droite ;
+- une fenêtre d'erreur si la compilation ou l'upload échoue.
+
+Après téléversement, cliquer sur **Connecter / PING**. La réponse attendue avec l'agent actuel est :
+
+```text
+EMBEDLAB_AGENT 1.1
+```
+
 ## Commandes série du firmware agent
 
 L'application envoie d'abord un petit firmware agent dans le microcontrôleur. Ensuite, elle communique avec lui par port série. Le microcontrôleur exécute les commandes reçues : allumer une LED, lire un bouton, lire une entrée analogique, générer un son, piloter le registre 74HC595N, lancer un test LCD 4 bits ou faire une marche sur plusieurs sorties.
