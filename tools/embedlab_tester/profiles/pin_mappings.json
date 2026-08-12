@@ -6,107 +6,35 @@
       {
         "name": "Étape 1 — entrées/sorties de base",
         "modules": {
-          "leds_rouges": {
-            "embedlab": "LED rouge choisie via header LEDs",
-            "pin": "4",
-            "note": "Tester D2 à D9 une par une avec la même broche si nécessaire."
-          },
-          "boutons_bp": {
-            "embedlab": "BP choisi via header BP",
-            "pin": "12",
-            "note": "Tester BP1 à BP5 un par un."
-          },
-          "dip_switch": {
-            "embedlab": "Position DIP choisie",
-            "pin": "13",
-            "note": "Tester les 6 positions une par une."
-          },
-          "buzzer": {
-            "embedlab": "Buzzer",
-            "pin": "A3"
-          },
-          "ldr": {
-            "embedlab": "LDR",
-            "pin": "A0"
-          },
-          "potentiometres": {
-            "embedlab": "POT1 puis POT2",
-            "pin": "A1",
-            "note": "Déplacer le fil de POT1 vers POT2 pour le second test."
-          },
-          "lm35": {
-            "embedlab": "LM35",
-            "pin": "A2"
-          }
+          "leds_rouges": {"embedlab": "LED rouge choisie via header LED1 à LED9", "pin": "4", "note": "Tester LED1 à LED9 une par une avec la même broche."},
+          "boutons_bp": {"embedlab": "BP choisi via header BP1 à BP5", "pin": "12", "note": "Tester BP1 à BP5 un par un."},
+          "dip_switch": {"embedlab": "Switch choisi : Switch1 à Switch6", "pin": "13", "note": "Tester les 6 positions une par une."},
+          "buzzer": {"embedlab": "Buzzer", "pin": "A3"},
+          "ldr": {"embedlab": "LDR", "pin": "A0"},
+          "potentiometres": {"embedlab": "POT1 puis POT2", "pin": "A1", "note": "Déplacer le fil de POT1 vers POT2 pour le second test."},
+          "lm35": {"embedlab": "LM35", "pin": "A2"}
         }
       },
       {
         "name": "Étape 2 — PWM et puissance basse tension",
         "modules": {
-          "leds_rgb": {
-            "embedlab": "RGB1/RGB2/RGB3 canal choisi",
-            "pin": "11",
-            "note": "Tester R, G, B un canal à la fois."
-          },
-          "relais": {
-            "embedlab": "Relais",
-            "pin": "10"
-          },
-          "mosfet": {
-            "embedlab": "J5 / MOSFET_Pin",
-            "pin": "11",
-            "note": "Connecter la broche PWM du microcontrôleur sur J5. Utiliser une alimentation externe pour la charge DC."
-          },
-          "pont_h": {
-            "embedlab": "PONT_H1/PONT_H2",
-            "pin1": "8",
-            "pin2": "9"
-          }
+          "leds_rgb": {"embedlab": "RGB1/RGB2/RGB3 canal choisi", "pin": "11", "note": "Tester R, G et B un canal à la fois."},
+          "relais": {"embedlab": "Relais", "pin": "10"},
+          "mosfet": {"embedlab": "J5 / MOSFET_Pin", "pin": "11", "note": "Connecter la broche PWM D11 sur J5. Charge DC sur alimentation externe."},
+          "pont_h": {"embedlab": "PONT_H1/PONT_H2", "pin1": "8", "pin2": "9", "note": "Test de base avec deux commandes. Les entrées PONT_H3/PONT_H4 peuvent être vérifiées ensuite selon le câblage final."}
         }
       },
       {
-        "name": "Étape 3 — bus et circuits logiques",
+        "name": "Étape 3 — bus, affichage et circuits logiques",
         "modules": {
-          "uart_ch340": {
-            "embedlab": "USB / J11",
-            "pin": "COM"
-          },
-          "i2c_scan": {
-            "embedlab": "J16 PCF8574N",
-            "sda": "A4",
-            "scl": "A5"
-          },
-          "pcf8574_gpio": {
-            "embedlab": "J16/J15 PCF8574N",
-            "sda": "A4",
-            "scl": "A5"
-          },
-          "shift_74hc595": {
-            "embedlab": "J14/J13 74HC595N",
-            "ds": "5",
-            "sh": "6",
-            "st": "7"
-          },
-          "lcd_1602": {
-            "embedlab": "LCD 1602 selon configuration de TP",
-            "pins": ["2", "3", "4", "5", "6", "7"],
-            "note": "Prévoir un câblage LCD dédié ou passer par l'I2C si disponible."
-          },
-          "seven_segment": {
-            "embedlab": "Afficheur 7 segments",
-            "pins": ["2", "3", "4", "5", "6", "7", "8", "9"],
-            "note": "Test visuel par segments, idéalement via 74HC595 pour économiser les broches."
-          },
-          "matrix_8x8": {
-            "embedlab": "Matrice LED 8x8",
-            "pins": ["2", "3", "4", "5", "6", "7", "8", "9"],
-            "note": "Test par lignes/colonnes, à faire par parties sur Uno."
-          },
-          "sn74ahct125": {
-            "embedlab": "J17/J18 SN74AHCT125",
-            "pin": "4",
-            "note": "Test de continuité logique : entrée côté microcontrôleur, sortie côté buffer."
-          }
+          "uart_ch340": {"embedlab": "USB / J11", "pin": "COM"},
+          "i2c_scan": {"embedlab": "J16 PCF8574N", "sda": "A4", "scl": "A5"},
+          "pcf8574_gpio": {"embedlab": "J16/J15 PCF8574N", "sda": "A4", "scl": "A5", "addr": "0x20", "note": "Adresse 0x20 par défaut à confirmer si les broches d'adresse sont modifiées."},
+          "shift_74hc595": {"embedlab": "J14/J13 74HC595N", "ds": "5", "sh": "6", "st": "7"},
+          "lcd_1602": {"embedlab": "LCD 1602 mode 4 bits", "rs": "2", "en": "3", "d4": "4", "d5": "5", "d6": "6", "d7": "7"},
+          "seven_segment": {"embedlab": "SEG_A à SEG_G + DP", "pin1": "2", "pin2": "3", "pin3": "4", "pin4": "5", "pin5": "6", "pin6": "7", "pin7": "8", "pin8": "9", "note": "Test WALK des segments. Les digits DIGIT1 à DIGIT4 seront vérifiés ensuite dans un test multiplexé dédié."},
+          "matrix_8x8": {"embedlab": "Matrix_R1..R8 puis Matrix_C1..C8", "pin1": "2", "pin2": "3", "pin3": "4", "pin4": "5", "pin5": "6", "pin6": "7", "pin7": "8", "pin8": "9", "note": "Test par groupes de 8 lignes/colonnes pour économiser les broches de l'Arduino Uno."},
+          "sn74ahct125": {"embedlab": "J17/J18 SN74AHCT125", "pin": "4", "note": "Test de continuité logique : entrée côté microcontrôleur, sortie côté buffer."}
         }
       }
     ]
@@ -118,107 +46,35 @@
       {
         "name": "Étape 1 — entrées/sorties de base",
         "modules": {
-          "leds_rouges": {
-            "embedlab": "LED rouge choisie via header LEDs",
-            "pin": "4",
-            "note": "Tester D2 à D9 une par une avec la même broche si nécessaire."
-          },
-          "boutons_bp": {
-            "embedlab": "BP choisi via header BP",
-            "pin": "12",
-            "note": "Tester BP1 à BP5 un par un."
-          },
-          "dip_switch": {
-            "embedlab": "Position DIP choisie",
-            "pin": "13",
-            "note": "Tester les 6 positions une par une."
-          },
-          "buzzer": {
-            "embedlab": "Buzzer",
-            "pin": "A3"
-          },
-          "ldr": {
-            "embedlab": "LDR",
-            "pin": "A0"
-          },
-          "potentiometres": {
-            "embedlab": "POT1 puis POT2",
-            "pin": "A1",
-            "note": "Déplacer le fil de POT1 vers POT2 pour le second test."
-          },
-          "lm35": {
-            "embedlab": "LM35",
-            "pin": "A2"
-          }
+          "leds_rouges": {"embedlab": "LED rouge choisie via header LED1 à LED9", "pin": "4", "note": "Tester LED1 à LED9 une par une avec la même broche."},
+          "boutons_bp": {"embedlab": "BP choisi via header BP1 à BP5", "pin": "12", "note": "Tester BP1 à BP5 un par un."},
+          "dip_switch": {"embedlab": "Switch choisi : Switch1 à Switch6", "pin": "13", "note": "Tester les 6 positions une par une."},
+          "buzzer": {"embedlab": "Buzzer", "pin": "A3"},
+          "ldr": {"embedlab": "LDR", "pin": "A0"},
+          "potentiometres": {"embedlab": "POT1 puis POT2", "pin": "A1", "note": "Déplacer le fil de POT1 vers POT2 pour le second test."},
+          "lm35": {"embedlab": "LM35", "pin": "A2"}
         }
       },
       {
         "name": "Étape 2 — PWM et puissance basse tension",
         "modules": {
-          "leds_rgb": {
-            "embedlab": "RGB1/RGB2/RGB3 canal choisi",
-            "pin": "11",
-            "note": "Tester R, G, B un canal à la fois."
-          },
-          "relais": {
-            "embedlab": "Relais",
-            "pin": "10"
-          },
-          "mosfet": {
-            "embedlab": "J5 / MOSFET_Pin",
-            "pin": "11",
-            "note": "Connecter la broche PWM du microcontrôleur sur J5. Utiliser une alimentation externe pour la charge DC."
-          },
-          "pont_h": {
-            "embedlab": "PONT_H1/PONT_H2",
-            "pin1": "8",
-            "pin2": "9"
-          }
+          "leds_rgb": {"embedlab": "RGB1/RGB2/RGB3 canal choisi", "pin": "11", "note": "Tester R, G et B un canal à la fois."},
+          "relais": {"embedlab": "Relais", "pin": "10"},
+          "mosfet": {"embedlab": "J5 / MOSFET_Pin", "pin": "11", "note": "Connecter la broche PWM D11 sur J5. Charge DC sur alimentation externe."},
+          "pont_h": {"embedlab": "PONT_H1/PONT_H2", "pin1": "8", "pin2": "9", "note": "Test de base avec deux commandes. Les entrées PONT_H3/PONT_H4 peuvent être vérifiées ensuite selon le câblage final."}
         }
       },
       {
-        "name": "Étape 3 — bus et circuits logiques",
+        "name": "Étape 3 — bus, affichage et circuits logiques",
         "modules": {
-          "uart_ch340": {
-            "embedlab": "USB / J11",
-            "pin": "COM"
-          },
-          "i2c_scan": {
-            "embedlab": "J16 PCF8574N",
-            "sda": "A4",
-            "scl": "A5"
-          },
-          "pcf8574_gpio": {
-            "embedlab": "J16/J15 PCF8574N",
-            "sda": "A4",
-            "scl": "A5"
-          },
-          "shift_74hc595": {
-            "embedlab": "J14/J13 74HC595N",
-            "ds": "5",
-            "sh": "6",
-            "st": "7"
-          },
-          "lcd_1602": {
-            "embedlab": "LCD 1602 selon configuration de TP",
-            "pins": ["2", "3", "4", "5", "6", "7"],
-            "note": "Prévoir un câblage LCD dédié ou passer par l'I2C si disponible."
-          },
-          "seven_segment": {
-            "embedlab": "Afficheur 7 segments",
-            "pins": ["2", "3", "4", "5", "6", "7", "8", "9"],
-            "note": "Test visuel par segments, idéalement via 74HC595 pour économiser les broches."
-          },
-          "matrix_8x8": {
-            "embedlab": "Matrice LED 8x8",
-            "pins": ["2", "3", "4", "5", "6", "7", "8", "9"],
-            "note": "Test par lignes/colonnes, à faire par parties sur Uno."
-          },
-          "sn74ahct125": {
-            "embedlab": "J17/J18 SN74AHCT125",
-            "pin": "4",
-            "note": "Test de continuité logique : entrée côté microcontrôleur, sortie côté buffer."
-          }
+          "uart_ch340": {"embedlab": "USB / J11", "pin": "COM"},
+          "i2c_scan": {"embedlab": "J16 PCF8574N", "sda": "A4", "scl": "A5"},
+          "pcf8574_gpio": {"embedlab": "J16/J15 PCF8574N", "sda": "A4", "scl": "A5", "addr": "0x20", "note": "Adresse 0x20 par défaut à confirmer si les broches d'adresse sont modifiées."},
+          "shift_74hc595": {"embedlab": "J14/J13 74HC595N", "ds": "5", "sh": "6", "st": "7"},
+          "lcd_1602": {"embedlab": "LCD 1602 mode 4 bits", "rs": "2", "en": "3", "d4": "4", "d5": "5", "d6": "6", "d7": "7"},
+          "seven_segment": {"embedlab": "SEG_A à SEG_G + DP", "pin1": "2", "pin2": "3", "pin3": "4", "pin4": "5", "pin5": "6", "pin6": "7", "pin7": "8", "pin8": "9", "note": "Test WALK des segments. Les digits DIGIT1 à DIGIT4 seront vérifiés ensuite dans un test multiplexé dédié."},
+          "matrix_8x8": {"embedlab": "Matrix_R1..R8 puis Matrix_C1..C8", "pin1": "2", "pin2": "3", "pin3": "4", "pin4": "5", "pin5": "6", "pin6": "7", "pin7": "8", "pin8": "9", "note": "Test par groupes de 8 lignes/colonnes pour économiser les broches de l'Arduino Nano."},
+          "sn74ahct125": {"embedlab": "J17/J18 SN74AHCT125", "pin": "4", "note": "Test de continuité logique : entrée côté microcontrôleur, sortie côté buffer."}
         }
       }
     ]
@@ -230,103 +86,35 @@
       {
         "name": "Étape 1 — test global E/S et capteurs",
         "modules": {
-          "leds_rouges": {
-            "embedlab": "LED1 à LED9",
-            "pins": ["22", "23", "24", "25", "26", "27", "28", "29"],
-            "pin": "22",
-            "note": "Possibilité de câbler plusieurs LEDs simultanément."
-          },
-          "leds_rgb": {
-            "embedlab": "RGB1/RGB2/RGB3",
-            "pin": "44",
-            "note": "Tester un canal à la fois ou utiliser 44/45/46 pour trois canaux."
-          },
-          "boutons_bp": {
-            "embedlab": "BP1 à BP5",
-            "pin": "30",
-            "note": "Possibilité d'utiliser 30 à 34."
-          },
-          "dip_switch": {
-            "embedlab": "Switch1 à Switch6",
-            "pin": "35",
-            "note": "Possibilité d'utiliser 35 à 40."
-          },
-          "potentiometres": {
-            "embedlab": "POT1/POT2",
-            "pin": "A0"
-          },
-          "ldr": {
-            "embedlab": "LDR",
-            "pin": "A1"
-          },
-          "lm35": {
-            "embedlab": "LM35",
-            "pin": "A2"
-          },
-          "buzzer": {
-            "embedlab": "Buzzer",
-            "pin": "41"
-          }
+          "leds_rouges": {"embedlab": "LED1 à LED9", "pin": "22", "pin1": "22", "pin2": "23", "pin3": "24", "pin4": "25", "pin5": "26", "pin6": "27", "pin7": "28", "pin8": "29", "note": "Possibilité de câbler plusieurs LEDs simultanément."},
+          "leds_rgb": {"embedlab": "RGB1/RGB2/RGB3", "pin": "44", "note": "Tester un canal à la fois ou utiliser 44/45/46 pour trois canaux."},
+          "boutons_bp": {"embedlab": "BP1 à BP5", "pin": "30", "note": "Possibilité d'utiliser 30 à 34."},
+          "dip_switch": {"embedlab": "Switch1 à Switch6", "pin": "35", "note": "Possibilité d'utiliser 35 à 40."},
+          "potentiometres": {"embedlab": "POT1/POT2", "pin": "A0"},
+          "ldr": {"embedlab": "LDR", "pin": "A1"},
+          "lm35": {"embedlab": "LM35", "pin": "A2"},
+          "buzzer": {"embedlab": "Buzzer", "pin": "41"}
         }
       },
       {
-        "name": "Étape 2 — communication et logique",
+        "name": "Étape 2 — communication, logique et affichage",
         "modules": {
-          "uart_ch340": {
-            "embedlab": "USB / J11",
-            "pin": "COM"
-          },
-          "i2c_scan": {
-            "embedlab": "J16 PCF8574N",
-            "sda": "20",
-            "scl": "21"
-          },
-          "pcf8574_gpio": {
-            "embedlab": "J16/J15 PCF8574N",
-            "sda": "20",
-            "scl": "21"
-          },
-          "shift_74hc595": {
-            "embedlab": "J14/J13 74HC595N",
-            "ds": "50",
-            "sh": "52",
-            "st": "53"
-          },
-          "lcd_1602": {
-            "embedlab": "LCD 1602",
-            "pins": ["22", "23", "24", "25", "26", "27"]
-          },
-          "seven_segment": {
-            "embedlab": "SEG_A à SEG_G, DP, DIGIT1 à DIGIT4",
-            "pins": ["22", "23", "24", "25", "26", "27", "28", "29"]
-          },
-          "matrix_8x8": {
-            "embedlab": "Matrix_R1..R8 / Matrix_C1..C8",
-            "pins": ["30", "31", "32", "33", "34", "35", "36", "37"]
-          },
-          "sn74ahct125": {
-            "embedlab": "J17/J18 SN74AHCT125",
-            "pin": "42"
-          }
+          "uart_ch340": {"embedlab": "USB / J11", "pin": "COM"},
+          "i2c_scan": {"embedlab": "J16 PCF8574N", "sda": "20", "scl": "21"},
+          "pcf8574_gpio": {"embedlab": "J16/J15 PCF8574N", "sda": "20", "scl": "21", "addr": "0x20"},
+          "shift_74hc595": {"embedlab": "J14/J13 74HC595N", "ds": "50", "sh": "52", "st": "53"},
+          "lcd_1602": {"embedlab": "LCD 1602 mode 4 bits", "rs": "22", "en": "23", "d4": "24", "d5": "25", "d6": "26", "d7": "27"},
+          "seven_segment": {"embedlab": "SEG_A à SEG_G + DP", "pin1": "22", "pin2": "23", "pin3": "24", "pin4": "25", "pin5": "26", "pin6": "27", "pin7": "28", "pin8": "29"},
+          "matrix_8x8": {"embedlab": "Matrix_R1..R8 / Matrix_C1..C8", "pin1": "30", "pin2": "31", "pin3": "32", "pin4": "33", "pin5": "34", "pin6": "35", "pin7": "36", "pin8": "37"},
+          "sn74ahct125": {"embedlab": "J17/J18 SN74AHCT125", "pin": "42"}
         }
       },
       {
         "name": "Étape 3 — puissance basse tension",
         "modules": {
-          "relais": {
-            "embedlab": "Relais",
-            "pin": "43"
-          },
-          "mosfet": {
-            "embedlab": "J5 / MOSFET_Pin",
-            "pin": "45",
-            "note": "Connecter la broche PWM 45 sur J5. Charge DC sur alimentation externe."
-          },
-          "pont_h": {
-            "embedlab": "PONT_H1/PONT_H2",
-            "pin1": "46",
-            "pin2": "47"
-          }
+          "relais": {"embedlab": "Relais", "pin": "43"},
+          "mosfet": {"embedlab": "J5 / MOSFET_Pin", "pin": "45", "note": "Connecter la broche PWM 45 sur J5. Charge DC sur alimentation externe."},
+          "pont_h": {"embedlab": "PONT_H1/PONT_H2", "pin1": "46", "pin2": "47"}
         }
       }
     ]
@@ -338,74 +126,24 @@
       {
         "name": "Étape ESP32 — tests guidés par parties",
         "modules": {
-          "leds_rouges": {
-            "embedlab": "LED choisie",
-            "pin": "25"
-          },
-          "leds_rgb": {
-            "embedlab": "Canal RGB choisi",
-            "pin": "26"
-          },
-          "boutons_bp": {
-            "embedlab": "BP choisi",
-            "pin": "27"
-          },
-          "dip_switch": {
-            "embedlab": "DIP choisi",
-            "pin": "14"
-          },
-          "potentiometres": {
-            "embedlab": "POT1/POT2",
-            "pin": "32"
-          },
-          "ldr": {
-            "embedlab": "LDR",
-            "pin": "33"
-          },
-          "lm35": {
-            "embedlab": "LM35",
-            "pin": "34"
-          },
-          "buzzer": {
-            "embedlab": "Buzzer",
-            "pin": "13"
-          },
-          "i2c_scan": {
-            "embedlab": "J16 PCF8574N",
-            "sda": "21",
-            "scl": "22"
-          },
-          "pcf8574_gpio": {
-            "embedlab": "J16/J15 PCF8574N",
-            "sda": "21",
-            "scl": "22"
-          },
-          "relais": {
-            "embedlab": "Relais",
-            "pin": "16"
-          },
-          "mosfet": {
-            "embedlab": "J5 / MOSFET_Pin",
-            "pin": "17",
-            "note": "J10 sur 3,3 V. Commande J5 en logique 3,3 V. Charge DC sur alimentation externe."
-          },
-          "pont_h": {
-            "embedlab": "PONT_H1/PONT_H2",
-            "pin1": "18",
-            "pin2": "19"
-          }
+          "leds_rouges": {"embedlab": "LED choisie", "pin": "25"},
+          "leds_rgb": {"embedlab": "Canal RGB choisi", "pin": "26"},
+          "boutons_bp": {"embedlab": "BP choisi", "pin": "27"},
+          "dip_switch": {"embedlab": "DIP choisi", "pin": "14"},
+          "potentiometres": {"embedlab": "POT1/POT2", "pin": "32"},
+          "ldr": {"embedlab": "LDR", "pin": "33"},
+          "lm35": {"embedlab": "LM35", "pin": "34"},
+          "buzzer": {"embedlab": "Buzzer", "pin": "13"},
+          "i2c_scan": {"embedlab": "J16 PCF8574N", "sda": "21", "scl": "22"},
+          "pcf8574_gpio": {"embedlab": "J16/J15 PCF8574N", "sda": "21", "scl": "22", "addr": "0x20"},
+          "shift_74hc595": {"embedlab": "J14/J13 74HC595N", "ds": "23", "sh": "18", "st": "5"},
+          "relais": {"embedlab": "Relais", "pin": "16"},
+          "mosfet": {"embedlab": "J5 / MOSFET_Pin", "pin": "17", "note": "J10 sur 3,3 V. Commande J5 en logique 3,3 V. Charge DC sur alimentation externe."},
+          "pont_h": {"embedlab": "PONT_H1/PONT_H2", "pin1": "18", "pin2": "19"}
         }
       }
     ]
   },
-  "stm32": {
-    "strategy": "mode_guide",
-    "notes": "STM32 : mapping à renseigner selon la carte exacte. J10 sur 3,3 V.",
-    "stages": []
-  },
-  "pic16f": {
-    "strategy": "mode_guide_hex",
-    "notes": "PIC16F : mapping à renseigner selon le modèle exact et le programmateur. Export HEX prévu dans une itération ultérieure.",
-    "stages": []
-  }
+  "stm32": {"strategy": "mode_guide", "notes": "STM32 : mapping à renseigner selon la carte exacte. J10 sur 3,3 V.", "stages": []},
+  "pic16f": {"strategy": "mode_guide_hex", "notes": "PIC16F : mapping à renseigner selon le modèle exact et le programmateur. Export HEX prévu dans une itération ultérieure.", "stages": []}
 }
