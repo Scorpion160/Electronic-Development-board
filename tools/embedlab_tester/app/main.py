@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
 import subprocess
 import sys
 import threading
@@ -82,6 +83,7 @@ class EmbedLabTester(tk.Tk):
         self.pin_mappings = load_json("profiles", "pin_mappings.json")
         self.agent = SerialAgent()
         self.results = []
+        self.status_var = tk.StringVar(value="Prêt.")
 
         self.configure(bg="#f4f8fc")
         self.style_ui()
@@ -102,6 +104,7 @@ class EmbedLabTester(tk.Tk):
         style.configure("H.TLabel", background="#ffffff", foreground="#061E39", font=("Segoe UI", 12, "bold"))
         style.configure("Muted.TLabel", background="#ffffff", foreground="#64748b", font=("Segoe UI", 9))
         style.configure("TLabel", background="#ffffff", foreground="#1f2937", font=("Segoe UI", 10))
+        style.configure("Status.TLabel", background="#eef6ff", foreground="#0B4775", font=("Segoe UI", 9, "bold"))
         style.configure("TButton", font=("Segoe UI", 10))
         style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"))
 
@@ -147,14 +150,18 @@ class EmbedLabTester(tk.Tk):
         ttk.Button(left, text="Connecter / PING", command=self.connect_serial).pack(fill="x", pady=4)
         ttk.Button(left, text="Exporter rapport CSV", command=self.export_csv).pack(fill="x", pady=4)
 
+        status_frame = ttk.Frame(left, padding=8, style="Card.TFrame")
+        status_frame.pack(fill="x", pady=(8, 0))
+        ttk.Label(status_frame, textvariable=self.status_var, style="Status.TLabel", wraplength=300).pack(fill="x")
+
         ttk.Label(left, text="Plan de câblage", style="H.TLabel").pack(anchor=W, pady=(14, 0))
-        self.board_text = tk.Text(left, height=18, width=39, bg="#eef6ff", relief="flat", wrap="word")
+        self.board_text = tk.Text(left, height=15, width=39, bg="#eef6ff", relief="flat", wrap="word")
         self.board_text.pack(fill="x", pady=(6, 0))
 
         ttk.Label(right, text="2. Modules à tester", style="H.TLabel").pack(anchor=W)
         ttk.Label(right, text="La colonne Étape indique quand il faut changer le câblage si la carte manque de broches.", style="Muted.TLabel").pack(anchor=W)
         columns = ("id", "module", "stage", "mapping")
-        self.module_table = ttk.Treeview(right, columns=columns, show="headings", height=10)
+        self.module_table = ttk.Treeview(right, columns=columns, show="headings", height=9)
         self.module_table.heading("id", text="ID")
         self.module_table.heading("module", text="Module")
         self.module_table.heading("stage", text="Étape")
@@ -175,12 +182,13 @@ class EmbedLabTester(tk.Tk):
         ttk.Button(btns, text="Non testé", command=lambda: self.add_result("NON_TESTE")).pack(side=LEFT, padx=8)
 
         ttk.Label(right, text="3. Câblage et protocole", style="H.TLabel").pack(anchor=W, pady=(12, 0))
-        self.details = tk.Text(right, height=18, bg="#ffffff", relief="solid", borderwidth=1, wrap="word", font=("Segoe UI", 10))
-        self.details.pack(fill=BOTH, expand=True, pady=(6, 10))
+        self.details = tk.Text(right, height=11, bg="#ffffff", relief="solid", borderwidth=1, wrap="word", font=("Segoe UI", 10))
+        self.details.pack(fill=BOTH, expand=True, pady=(6, 8))
 
         ttk.Label(right, text="4. Journal", style="H.TLabel").pack(anchor=W)
-        self.log = tk.Text(right, height=8, bg="#111827", fg="#e5e7eb", relief="flat", wrap="word", font=("Consolas", 9))
-        self.log.pack(fill=BOTH, expand=False, pady=(6, 0))
+        self.log = tk.Text(right, height=7, bg="#111827", fg="#e5e7eb", relief="flat", wrap="word", font=("Consolas", 9))
+        self.log.pack(fill="x", expand=False, pady=(6, 0))
+        self.write_log("Journal prêt. Les messages de compilation/téléversement apparaîtront ici.")
 
     def current_board(self):
         return next(b for b in self.boards if b["id"] == self.board_id.get())
@@ -212,6 +220,11 @@ class EmbedLabTester(tk.Tk):
         self.port_combo["values"] = ports
         if ports and not self.port.get():
             self.port.set(ports[0])
+        self.set_status(f"{len(ports)} port(s) COM détecté(s)." if ports else "Aucun port COM détecté.")
+
+    def set_status(self, text: str):
+        self.status_var.set(text)
+        self.update_idletasks()
 
     def refresh_board_info(self):
         b = self.current_board()
@@ -249,7 +262,7 @@ class EmbedLabTester(tk.Tk):
         if not mapping:
             return "à définir manuellement"
         pairs = []
-        for key in ("pin", "pin1", "pin2", "sda", "scl", "ds", "st", "sh", "data", "clk", "latch"):
+        for key in ("pin", "pin1", "pin2", "pin3", "pin4", "pin5", "pin6", "pin7", "pin8", "sda", "scl", "ds", "st", "sh", "rs", "en", "d4", "d5", "d6", "d7", "addr"):
             if key in mapping:
                 pairs.append(f"{key}={mapping[key]}")
         if "pins" in mapping:
@@ -327,45 +340,109 @@ class EmbedLabTester(tk.Tk):
     def upload_firmware(self):
         b = self.current_board()
         port = self.port.get()
+        self.write_log("=== Demande de téléversement du firmware agent ===")
+        self.set_status("Préparation du téléversement...")
+
         if not port:
-            messagebox.showwarning(APP_NAME, "Sélectionnez le port COM.")
+            self.set_status("Téléversement impossible : aucun port COM sélectionné.")
+            messagebox.showwarning(APP_NAME, "Sélectionnez d'abord le port COM du microcontrôleur.")
             return
+
         if b.get("upload_mode") != "arduino-cli" or not b.get("fqbn"):
-            messagebox.showinfo(APP_NAME, "Téléversement automatique non activé pour ce profil. Utiliser le mode guidé.")
+            self.set_status("Profil non compatible avec le téléversement automatique.")
+            messagebox.showinfo(
+                APP_NAME,
+                "Le téléversement automatique n'est pas encore activé pour ce profil.\n"
+                "Utilisez le mode guidé ou ajoutez la méthode de flash adaptée.",
+            )
+            return
+
+        arduino_cli = shutil.which("arduino-cli")
+        if arduino_cli is None:
+            self.set_status("arduino-cli introuvable : impossible de téléverser automatiquement.")
+            self.write_log("ERREUR : arduino-cli introuvable dans le PATH.")
+            messagebox.showerror(
+                APP_NAME,
+                "arduino-cli est introuvable.\n\n"
+                "Installez Arduino CLI ou ajoutez arduino-cli.exe au PATH Windows, puis relancez l'application.\n\n"
+                "Test rapide dans PowerShell :\narduino-cli version",
+            )
             return
 
         firmware = app_path("firmware", "arduino_agent")
+        if not firmware.exists():
+            self.set_status("Dossier firmware introuvable.")
+            self.write_log(f"ERREUR : dossier firmware introuvable : {firmware}")
+            messagebox.showerror(APP_NAME, f"Dossier firmware introuvable :\n{firmware}")
+            return
+
         commands = [
-            ["arduino-cli", "compile", "--fqbn", b["fqbn"], str(firmware)],
-            ["arduino-cli", "upload", "-p", port, "--fqbn", b["fqbn"], str(firmware)],
+            [arduino_cli, "compile", "--fqbn", b["fqbn"], str(firmware)],
+            [arduino_cli, "upload", "-p", port, "--fqbn", b["fqbn"], str(firmware)],
         ]
 
+        self.write_log(f"Carte : {b['name']}")
+        self.write_log(f"Port : {port}")
+        self.write_log(f"FQBN : {b['fqbn']}")
+        self.write_log(f"Firmware : {firmware}")
+        self.write_log(f"Arduino CLI : {arduino_cli}")
+        self.set_status("Compilation en cours... Consultez le journal en bas à droite.")
+        messagebox.showinfo(
+            APP_NAME,
+            "Le téléversement est lancé.\n\n"
+            "Regardez le journal en bas à droite pour voir la compilation et l'upload.\n"
+            "Si l'Arduino redémarre, attendez la fin avant de cliquer sur Connecter / PING.",
+        )
+
+        def ui_log(text: str):
+            self.after(0, self.write_log, text)
+
+        def ui_status(text: str):
+            self.after(0, self.set_status, text)
+
+        def ui_error(text: str):
+            self.after(0, messagebox.showerror, APP_NAME, text)
+
+        def ui_info(text: str):
+            self.after(0, messagebox.showinfo, APP_NAME, text)
+
         def worker():
-            for cmd in commands:
-                self.write_log("> " + " ".join(cmd))
+            for index, cmd in enumerate(commands, start=1):
+                phase = "Compilation" if index == 1 else "Téléversement"
+                ui_status(f"{phase} en cours...")
+                ui_log("> " + " ".join(cmd))
                 try:
                     p = subprocess.run(cmd, capture_output=True, text=True, check=False)
-                    if p.stdout:
-                        self.write_log(p.stdout.strip())
-                    if p.stderr:
-                        self.write_log(p.stderr.strip())
-                    if p.returncode:
-                        self.write_log(f"ERREUR : code {p.returncode}")
-                        return
                 except FileNotFoundError:
-                    self.write_log("arduino-cli introuvable. Installez Arduino CLI et ajoutez-le au PATH.")
+                    ui_status("arduino-cli introuvable.")
+                    ui_log("ERREUR : arduino-cli introuvable.")
+                    ui_error("arduino-cli est introuvable. Ajoutez-le au PATH Windows.")
                     return
-            self.write_log("Firmware agent téléversé.")
+                if p.stdout:
+                    ui_log(p.stdout.strip())
+                if p.stderr:
+                    ui_log(p.stderr.strip())
+                if p.returncode:
+                    ui_status(f"{phase} échouée. Voir le journal.")
+                    ui_log(f"ERREUR : code retour {p.returncode}")
+                    ui_error(f"{phase} échouée. Consultez le journal en bas à droite.")
+                    return
+            ui_status("Firmware agent téléversé. Cliquez maintenant sur Connecter / PING.")
+            ui_log("OK : firmware agent téléversé.")
+            ui_info("Firmware agent téléversé. Cliquez maintenant sur Connecter / PING.")
 
         threading.Thread(target=worker, daemon=True).start()
 
     def connect_serial(self):
         try:
+            self.set_status("Connexion série en cours...")
             response = self.agent.connect(self.port.get())
             self.write_log("> PING")
             self.write_log("< " + response)
+            self.set_status("Connexion série OK : " + response)
             messagebox.showinfo(APP_NAME, "Connexion série OK : " + response)
         except Exception as exc:
+            self.set_status("Connexion série impossible.")
             messagebox.showerror(APP_NAME, str(exc))
 
     def resolve_command(self, cmd: str, mapping) -> str | None:
