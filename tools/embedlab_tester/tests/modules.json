@@ -1,0 +1,254 @@
+[
+  {
+    "id": "leds_rouges",
+    "name": "LEDs rouges D2 à D9",
+    "category": "sorties",
+    "level": "basic",
+    "required": {"digital_outputs": 1},
+    "wiring": [
+      "Relier une LED rouge à une broche digitale du microcontrôleur.",
+      "Relier le GND du microcontrôleur au GND de l'EmbedLab Board.",
+      "Tester les LEDs une par une si le microcontrôleur manque de broches."
+    ],
+    "protocol": [
+      "L'application allume la LED sélectionnée pendant 1 seconde.",
+      "L'utilisateur confirme si la LED s'allume correctement.",
+      "Répéter pour chaque LED."
+    ],
+    "commands": ["PINMODE {pin} OUTPUT", "DWRITE {pin} 1", "WAIT 1000", "DWRITE {pin} 0"],
+    "expected": "La LED testée doit s'allumer puis s'éteindre.",
+    "fault_hint": "Vérifier LED, résistance série, soudure, continuité et broche de header."
+  },
+  {
+    "id": "leds_rgb",
+    "name": "LEDs RGB D11 à D13",
+    "category": "sorties_pwm",
+    "level": "intermediate",
+    "required": {"pwm_outputs": 3},
+    "wiring": [
+      "Relier les canaux R, G et B à trois broches PWM si possible.",
+      "J10 doit correspondre à la tension du microcontrôleur.",
+      "Tester un seul canal à la fois si le nombre de PWM est limité."
+    ],
+    "protocol": [
+      "Allumer successivement rouge, vert, bleu.",
+      "Tester ensuite une variation PWM d'intensité.",
+      "Confirmer visuellement la couleur."
+    ],
+    "commands": ["PWM {pin} 255", "WAIT 700", "PWM {pin} 0"],
+    "expected": "Chaque canal doit s'allumer, puis varier si le PWM est utilisé.",
+    "fault_hint": "Vérifier polarité, résistance, broche de couleur et compatibilité de tension."
+  },
+  {
+    "id": "boutons_bp",
+    "name": "Boutons poussoirs BP1 à BP5",
+    "category": "entrees",
+    "level": "basic",
+    "required": {"digital_inputs": 1},
+    "wiring": [
+      "Relier la sortie du bouton à une entrée digitale.",
+      "Utiliser INPUT_PULLUP côté microcontrôleur si le montage est prévu ainsi.",
+      "Relier le GND commun."
+    ],
+    "protocol": [
+      "L'application lit l'état de l'entrée.",
+      "Appuyer puis relâcher le bouton.",
+      "Vérifier le changement d'état dans l'interface."
+    ],
+    "commands": ["PINMODE {pin} INPUT_PULLUP", "DREAD {pin}"],
+    "expected": "L'état doit changer entre relâché et appuyé.",
+    "fault_hint": "Vérifier bouton, résistance de tirage, soudure et continuité du header."
+  },
+  {
+    "id": "dip_switch",
+    "name": "DIP-switch 6 positions",
+    "category": "entrees",
+    "level": "basic",
+    "required": {"digital_inputs": 1},
+    "wiring": [
+      "Relier une position du DIP-switch à une entrée digitale.",
+      "Relier le GND commun.",
+      "Tester les 6 positions une par une."
+    ],
+    "protocol": [
+      "Basculer chaque interrupteur ON/OFF.",
+      "Observer la variation d'état dans l'interface."
+    ],
+    "commands": ["PINMODE {pin} INPUT_PULLUP", "DREAD {pin}"],
+    "expected": "Chaque position doit produire deux états distincts.",
+    "fault_hint": "Vérifier interrupteur, piste, soudure et tirage logique."
+  },
+  {
+    "id": "potentiometres",
+    "name": "Potentiomètres 1 et 2",
+    "category": "capteurs_analogiques",
+    "level": "basic",
+    "required": {"analog_inputs": 1},
+    "wiring": [
+      "Relier la sortie du potentiomètre à une entrée analogique.",
+      "Vérifier J10 avant connexion : 5 V pour Arduino, 3,3 V pour ESP32/STM32.",
+      "Relier le GND commun."
+    ],
+    "protocol": [
+      "Tourner le potentiomètre lentement.",
+      "Vérifier que la valeur ADC varie progressivement."
+    ],
+    "commands": ["AREAD {pin}"],
+    "expected": "La valeur ADC doit varier de façon régulière.",
+    "fault_hint": "Vérifier potentiomètre, curseur, alimentation, J10 et entrée ADC."
+  },
+  {
+    "id": "ldr",
+    "name": "LDR",
+    "category": "capteurs_analogiques",
+    "level": "basic",
+    "required": {"analog_inputs": 1},
+    "wiring": [
+      "Relier la sortie LDR à une entrée analogique.",
+      "Vérifier J10 avant connexion.",
+      "Relier le GND commun."
+    ],
+    "protocol": [
+      "Lire la valeur en lumière ambiante.",
+      "Couvrir la LDR avec la main.",
+      "Vérifier une variation nette de la valeur ADC."
+    ],
+    "commands": ["AREAD {pin}"],
+    "expected": "La valeur ADC doit varier entre lumière et obscurité.",
+    "fault_hint": "Vérifier LDR, pont diviseur, soudure, J10 et entrée ADC."
+  },
+  {
+    "id": "lm35",
+    "name": "Capteur de température LM35",
+    "category": "capteurs_analogiques",
+    "level": "intermediate",
+    "required": {"analog_inputs": 1},
+    "wiring": [
+      "Relier la sortie LM35 à une entrée analogique.",
+      "Respecter le sens du LM35 et la tension d'alimentation.",
+      "Vérifier J10 avant connexion."
+    ],
+    "protocol": [
+      "Lire la température estimée.",
+      "Approcher légèrement la main du capteur.",
+      "Vérifier une variation progressive."
+    ],
+    "commands": ["AREAD {pin}"],
+    "expected": "La valeur doit être stable puis varier doucement avec la température.",
+    "fault_hint": "Vérifier orientation du LM35, alimentation, soudure et entrée ADC."
+  },
+  {
+    "id": "buzzer",
+    "name": "Buzzer",
+    "category": "sorties_sonores",
+    "level": "basic",
+    "required": {"digital_outputs": 1},
+    "wiring": [
+      "Relier la commande buzzer à une broche digitale.",
+      "Relier le GND commun."
+    ],
+    "protocol": [
+      "L'application génère trois bips à des fréquences différentes.",
+      "Confirmer que les sons sont audibles."
+    ],
+    "commands": ["TONE {pin} 440 300", "WAIT 500", "TONE {pin} 880 300"],
+    "expected": "Le buzzer doit émettre des bips nets.",
+    "fault_hint": "Vérifier buzzer, transistor de commande si présent, polarité et soudure."
+  },
+  {
+    "id": "uart_ch340",
+    "name": "Interface USB-série CH340G",
+    "category": "communication",
+    "level": "basic",
+    "required": {"serial": true},
+    "wiring": [
+      "Connecter l'USB au PC.",
+      "Sélectionner le port COM détecté.",
+      "Pour une carte externe, croiser TX vers RX et RX vers TX si nécessaire."
+    ],
+    "protocol": [
+      "Envoyer PING depuis l'application.",
+      "Vérifier la réponse EMBEDLAB_AGENT."
+    ],
+    "commands": ["PING"],
+    "expected": "Le microcontrôleur doit répondre par EMBEDLAB_AGENT. Les LEDs TX/RX peuvent clignoter.",
+    "fault_hint": "Vérifier câble USB, pilote CH340, port COM et baudrate."
+  },
+  {
+    "id": "i2c_scan",
+    "name": "Bus I2C / PCF8574N",
+    "category": "communication",
+    "level": "intermediate",
+    "required": {"i2c": true},
+    "wiring": [
+      "Relier SDA et SCL du microcontrôleur aux headers I2C.",
+      "Relier GND commun.",
+      "Vérifier la tension logique et les résistances de tirage."
+    ],
+    "protocol": [
+      "Lancer un scan I2C.",
+      "Vérifier qu'une adresse est détectée pour le PCF8574N ou l'interface LCD."
+    ],
+    "commands": ["I2C_SCAN"],
+    "expected": "Au moins une adresse I2C doit être détectée si le module est câblé correctement.",
+    "fault_hint": "Vérifier SDA/SCL inversés, GND, alimentation, adresse et soudures du PCF8574N."
+  },
+  {
+    "id": "relais",
+    "name": "Relais SRD 5 V",
+    "category": "puissance",
+    "level": "intermediate",
+    "required": {"digital_outputs": 1},
+    "wiring": [
+      "Relier la commande relais à une sortie digitale.",
+      "Relier le GND commun.",
+      "Utiliser uniquement une charge DC basse tension en TP."
+    ],
+    "protocol": [
+      "Activer le relais pendant 1 seconde.",
+      "Écouter le clic et vérifier la commutation au multimètre si besoin."
+    ],
+    "commands": ["PINMODE {pin} OUTPUT", "DWRITE {pin} 1", "WAIT 1000", "DWRITE {pin} 0"],
+    "expected": "Le relais doit cliquer à l'activation et au relâchement.",
+    "fault_hint": "Vérifier transistor de commande, diode roue libre, bobine, 5 V et bornier."
+  },
+  {
+    "id": "mosfet",
+    "name": "MOSFET IRFZ44N / charge DC",
+    "category": "puissance",
+    "level": "intermediate",
+    "required": {"pwm_outputs": 1},
+    "wiring": [
+      "Relier la commande MOSFET à une sortie PWM.",
+      "Utiliser une charge DC basse tension externe.",
+      "Relier les masses si le montage n'est pas isolé."
+    ],
+    "protocol": [
+      "Appliquer un PWM faible puis élevé.",
+      "Observer la variation de la charge si elle est compatible PWM."
+    ],
+    "commands": ["PWM {pin} 80", "WAIT 1000", "PWM {pin} 200", "WAIT 1000", "PWM {pin} 0"],
+    "expected": "La charge doit s'activer ou varier selon le PWM.",
+    "fault_hint": "Vérifier MOSFET, grille, masse commune, charge externe et diode si charge inductive."
+  },
+  {
+    "id": "pont_h",
+    "name": "Pont en H",
+    "category": "puissance",
+    "level": "advanced",
+    "required": {"digital_outputs": 2},
+    "wiring": [
+      "Relier les entrées de commande du pont en H aux sorties digitales.",
+      "Utiliser un petit moteur DC basse tension avec alimentation externe.",
+      "Ne jamais activer les deux transistors d'une même branche simultanément."
+    ],
+    "protocol": [
+      "Commander le moteur dans un sens pendant 1 seconde.",
+      "Arrêter, puis inverser le sens pendant 1 seconde.",
+      "Confirmer que le moteur tourne correctement."
+    ],
+    "commands": ["PINMODE {pin1} OUTPUT", "PINMODE {pin2} OUTPUT", "DWRITE {pin1} 1", "DWRITE {pin2} 0", "WAIT 1000", "DWRITE {pin1} 0", "DWRITE {pin2} 1", "WAIT 1000", "DWRITE {pin1} 0", "DWRITE {pin2} 0"],
+    "expected": "Le moteur doit tourner dans les deux sens sans échauffement anormal.",
+    "fault_hint": "Vérifier transistors, commandes croisées, alimentation moteur, masse commune et court-circuit."
+  }
+]
