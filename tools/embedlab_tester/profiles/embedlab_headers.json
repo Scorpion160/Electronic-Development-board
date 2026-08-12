@@ -1,0 +1,107 @@
+{
+  "source": "Figure 5 — vue rapprochée des connecteurs d'accès aux signaux",
+  "status": "draft_from_pcb_view",
+  "notes": [
+    "Ce fichier sert de référence de brochage pour l'outil de diagnostic.",
+    "La broche de commande MOSFET n'apparaît pas sur la vue rapprochée des headers bas ; elle reste à confirmer depuis le schéma ou le PCB."
+  ],
+  "left_header": {
+    "top_row": [
+      "Switch1",
+      "Switch2",
+      "Switch3",
+      "Switch4",
+      "Switch5",
+      "Switch6",
+      "LM35",
+      "LDR",
+      "POT1",
+      "POT2",
+      "Buzzer",
+      "LED1",
+      "LED2",
+      "LED3",
+      "LED4",
+      "LED5",
+      "LED6",
+      "LED7",
+      "LED8",
+      "LED9",
+      "LED10"
+    ],
+    "bottom_row": [
+      "BP1",
+      "BP2",
+      "BP3",
+      "BP4",
+      "BP5",
+      "Matrix_C8",
+      "Matrix_C7",
+      "Matrix_C6",
+      "Matrix_C5",
+      "Matrix_C4",
+      "Matrix_C3",
+      "Matrix_C2",
+      "Matrix_C1",
+      "Matrix_R1",
+      "Matrix_R2",
+      "Matrix_R3",
+      "Matrix_R4",
+      "Matrix_R5",
+      "Matrix_R6",
+      "Matrix_R7",
+      "Matrix_R8"
+    ]
+  },
+  "right_header": {
+    "top_row": [
+      "RGB1_R",
+      "RGB1_G",
+      "RGB1_B",
+      "RGB2_R",
+      "RGB2_G",
+      "RGB2_B",
+      "RGB3_R",
+      "RGB3_G",
+      "RGB3_B",
+      "LCD_RS",
+      "LCD_E",
+      "LCD_D4",
+      "LCD_D5",
+      "LCD_D6",
+      "LCD_D7",
+      "PONT_H1",
+      "PONT_H2",
+      "PONT_H3",
+      "PONT_H4"
+    ],
+    "bottom_row": [
+      "DP",
+      "SEG_G",
+      "SEG_F",
+      "SEG_E",
+      "SEG_D",
+      "SEG_C",
+      "SEG_B",
+      "SEG_A",
+      "DIGIT4",
+      "DIGIT3",
+      "DIGIT2",
+      "DIGIT1",
+      "GND",
+      "GND",
+      "+5V",
+      "+5V",
+      "+3V3",
+      "+3V3",
+      "Relais"
+    ]
+  },
+  "not_visible_on_figure": {
+    "mosfet_command": {
+      "label": "MOSFET_CMD",
+      "status": "to_confirm",
+      "comment": "La commande MOSFET est présente sur la carte mais non visible sur cette vue de connecteurs. À renseigner avec le repère exact du schéma ou du PCB."
+    }
+  }
+}
