@@ -41,6 +41,8 @@ class SerialAgent:
     def connect(self, port: str) -> str:
         if serial is None:
             raise RuntimeError("pyserial n'est pas installé.")
+        if not port:
+            raise RuntimeError("Aucun port COM sélectionné.")
         self.close()
         self.ser = serial.Serial(port, BAUDRATE, timeout=1)
         time.sleep(1.5)
@@ -72,11 +74,12 @@ class EmbedLabTester(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP_NAME)
-        self.geometry("1180x740")
-        self.minsize(1000, 650)
+        self.geometry("1220x760")
+        self.minsize(1080, 680)
 
         self.boards = load_json("profiles", "boards.json")
         self.modules = load_json("tests", "modules.json")
+        self.pin_mappings = load_json("profiles", "pin_mappings.json")
         self.agent = SerialAgent()
         self.results = []
 
@@ -97,6 +100,7 @@ class EmbedLabTester(tk.Tk):
         style.configure("Card.TFrame", background="#ffffff")
         style.configure("Title.TLabel", background="#f4f8fc", foreground="#061E39", font=("Segoe UI", 22, "bold"))
         style.configure("H.TLabel", background="#ffffff", foreground="#061E39", font=("Segoe UI", 12, "bold"))
+        style.configure("Muted.TLabel", background="#ffffff", foreground="#64748b", font=("Segoe UI", 9))
         style.configure("TLabel", background="#ffffff", foreground="#1f2937", font=("Segoe UI", 10))
         style.configure("TButton", font=("Segoe UI", 10))
         style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"))
@@ -107,7 +111,7 @@ class EmbedLabTester(tk.Tk):
         ttk.Label(header, text=APP_NAME, style="Title.TLabel").pack(anchor=W)
         ttk.Label(
             header,
-            text="Application de diagnostic guidé : choix carte, port COM, câblage, test et rapport.",
+            text="Diagnostic guidé : choix microcontrôleur, mapping des broches, câblage, test et rapport.",
             background="#f4f8fc",
             foreground="#0B4775",
         ).pack(anchor=W)
@@ -124,13 +128,13 @@ class EmbedLabTester(tk.Tk):
         ttk.Label(left, text="1. Configuration", style="H.TLabel").pack(anchor=W)
         ttk.Label(left, text="Microcontrôleur").pack(anchor=W, pady=(12, 2))
         self.board_id = tk.StringVar(value=self.boards[0]["id"])
-        self.board_combo = ttk.Combobox(left, textvariable=self.board_id, values=[b["id"] for b in self.boards], state="readonly", width=28)
+        self.board_combo = ttk.Combobox(left, textvariable=self.board_id, values=[b["id"] for b in self.boards], state="readonly", width=30)
         self.board_combo.pack(anchor=W)
-        self.board_combo.bind("<<ComboboxSelected>>", lambda _e: self.refresh_board_info())
+        self.board_combo.bind("<<ComboboxSelected>>", lambda _e: self.on_board_changed())
 
         ttk.Label(left, text="Port COM").pack(anchor=W, pady=(12, 2))
         self.port = tk.StringVar()
-        self.port_combo = ttk.Combobox(left, textvariable=self.port, values=[], state="readonly", width=28)
+        self.port_combo = ttk.Combobox(left, textvariable=self.port, values=[], state="readonly", width=30)
         self.port_combo.pack(anchor=W)
         ttk.Button(left, text="Actualiser les ports", command=self.refresh_ports).pack(anchor=W, pady=(6, 0))
 
@@ -143,13 +147,24 @@ class EmbedLabTester(tk.Tk):
         ttk.Button(left, text="Connecter / PING", command=self.connect_serial).pack(fill="x", pady=4)
         ttk.Button(left, text="Exporter rapport CSV", command=self.export_csv).pack(fill="x", pady=4)
 
-        self.board_text = tk.Text(left, height=14, width=36, bg="#eef6ff", relief="flat", wrap="word")
-        self.board_text.pack(fill="x", pady=(12, 0))
+        ttk.Label(left, text="Plan de câblage", style="H.TLabel").pack(anchor=W, pady=(14, 0))
+        self.board_text = tk.Text(left, height=18, width=39, bg="#eef6ff", relief="flat", wrap="word")
+        self.board_text.pack(fill="x", pady=(6, 0))
 
         ttk.Label(right, text="2. Modules à tester", style="H.TLabel").pack(anchor=W)
-        self.module_list = tk.Listbox(right, height=9, exportselection=False, font=("Segoe UI", 10))
-        self.module_list.pack(fill="x", pady=(6, 10))
-        self.module_list.bind("<<ListboxSelect>>", lambda _e: self.show_selected_module())
+        ttk.Label(right, text="La colonne Étape indique quand il faut changer le câblage si la carte manque de broches.", style="Muted.TLabel").pack(anchor=W)
+        columns = ("id", "module", "stage", "mapping")
+        self.module_table = ttk.Treeview(right, columns=columns, show="headings", height=10)
+        self.module_table.heading("id", text="ID")
+        self.module_table.heading("module", text="Module")
+        self.module_table.heading("stage", text="Étape")
+        self.module_table.heading("mapping", text="Brochage proposé")
+        self.module_table.column("id", width=130)
+        self.module_table.column("module", width=280)
+        self.module_table.column("stage", width=210)
+        self.module_table.column("mapping", width=360)
+        self.module_table.pack(fill="x", pady=(6, 10))
+        self.module_table.bind("<<TreeviewSelect>>", lambda _e: self.show_selected_module())
 
         btns = ttk.Frame(right, style="Card.TFrame")
         btns.pack(fill="x")
@@ -170,12 +185,27 @@ class EmbedLabTester(tk.Tk):
     def current_board(self):
         return next(b for b in self.boards if b["id"] == self.board_id.get())
 
-    def selected_module(self):
-        sel = self.module_list.curselection()
+    def current_mapping_profile(self):
+        return self.pin_mappings.get(self.board_id.get(), {"stages": []})
+
+    def module_by_id(self, module_id: str):
+        return next(m for m in self.modules if m["id"] == module_id)
+
+    def selected_module_id(self):
+        sel = self.module_table.selection()
         if not sel:
             return None
-        module_id = self.module_list.get(sel[0]).split(" | ")[0]
-        return next(m for m in self.modules if m["id"] == module_id)
+        return self.module_table.item(sel[0], "values")[0]
+
+    def selected_module(self):
+        module_id = self.selected_module_id()
+        if not module_id:
+            return None
+        return self.module_by_id(module_id)
+
+    def on_board_changed(self):
+        self.refresh_board_info()
+        self.refresh_modules()
 
     def refresh_ports(self):
         ports = [p.device for p in list_ports.comports()] if list_ports else []
@@ -185,40 +215,94 @@ class EmbedLabTester(tk.Tk):
 
     def refresh_board_info(self):
         b = self.current_board()
+        mapping = self.current_mapping_profile()
         lines = [
             f"Carte : {b['name']}",
             f"Tension logique : {b['logic_voltage']}",
             f"Téléversement : {b['upload_mode']}",
-            f"Statut : {b['status']}",
+            f"Stratégie : {b.get('recommended_strategy', 'non précisée')}",
             "",
             "Rappels :",
-            "- J10 sur 5 V pour Arduino.",
+            "- J10 sur 5 V pour Arduino Uno/Nano/Mega.",
             "- J10 sur 3,3 V pour ESP32/STM32.",
             "- GND commun obligatoire.",
-            "- Moteurs/charges sur alim externe.",
+            "- Moteurs/charges sur alimentation externe.",
             "",
-            b.get("notes", ""),
+            "Étapes de câblage prévues :",
         ]
+        for idx, stage in enumerate(mapping.get("stages", []), start=1):
+            modules = ", ".join(stage.get("modules", {}).keys())
+            lines.append(f"{idx}. {stage['name']} : {modules}")
+        lines.extend(["", b.get("notes", "")])
         self.board_text.delete("1.0", END)
         self.board_text.insert("1.0", "\n".join(lines))
 
+    def module_mapping(self, module_id: str):
+        profile = self.current_mapping_profile()
+        for stage in profile.get("stages", []):
+            modules = stage.get("modules", {})
+            if module_id in modules:
+                return stage, modules[module_id]
+        return None, None
+
+    def mapping_summary(self, mapping) -> str:
+        if not mapping:
+            return "à définir manuellement"
+        pairs = []
+        for key in ("pin", "pin1", "pin2", "sda", "scl", "ds", "st", "sh", "data", "clk", "latch"):
+            if key in mapping:
+                pairs.append(f"{key}={mapping[key]}")
+        if "pins" in mapping:
+            pairs.append("pins=" + ",".join(mapping["pins"]))
+        return " ; ".join(pairs) if pairs else mapping.get("note", "voir détails")
+
     def refresh_modules(self):
-        self.module_list.delete(0, END)
+        for item in self.module_table.get_children():
+            self.module_table.delete(item)
         mode = self.mode.get()
         mods = self.modules
         if mode == "rapide":
-            mods = [m for m in mods if m.get("level") == "basic"][:6]
+            mods = [m for m in mods if m.get("level") == "basic"][:7]
         for m in mods:
-            self.module_list.insert(END, f"{m['id']} | {m['name']}")
+            stage, mapping = self.module_mapping(m["id"])
+            stage_name = stage["name"] if stage else "manuel"
+            self.module_table.insert(
+                "",
+                END,
+                iid=m["id"],
+                values=(m["id"], m["name"], stage_name, self.mapping_summary(mapping)),
+            )
 
     def show_selected_module(self):
         m = self.selected_module()
         if not m:
             messagebox.showwarning(APP_NAME, "Sélectionnez un module.")
             return
+        stage, mapping = self.module_mapping(m["id"])
         lines = [
             f"MODULE : {m['name']}",
             f"Famille : {m['category']} | Niveau : {m['level']}",
+            "",
+            "ÉTAPE DE CÂBLAGE :",
+            stage["name"] if stage else "Mapping manuel à définir",
+            "",
+            "BROCHAGE PROPOSÉ :",
+        ]
+        if mapping:
+            if "embedlab" in mapping:
+                lines.append(f"- Côté EmbedLab : {mapping['embedlab']}")
+            for key, value in mapping.items():
+                if key in ("embedlab", "note"):
+                    continue
+                if isinstance(value, list):
+                    lines.append(f"- {key} microcontrôleur : {', '.join(value)}")
+                else:
+                    lines.append(f"- {key} microcontrôleur : {value}")
+            if mapping.get("note"):
+                lines.append(f"- Note : {mapping['note']}")
+        else:
+            lines.append("- Aucun mapping automatique disponible pour cette carte/module.")
+        lines.extend([
             "",
             "CÂBLAGE À RÉALISER :",
             *[f"- {x}" for x in m.get("wiring", [])],
@@ -231,7 +315,7 @@ class EmbedLabTester(tk.Tk):
             "",
             "PISTE DE DÉPANNAGE SI ÉCHEC :",
             m.get("fault_hint", ""),
-        ]
+        ])
         self.details.delete("1.0", END)
         self.details.insert("1.0", "\n".join(lines))
 
@@ -284,21 +368,45 @@ class EmbedLabTester(tk.Tk):
         except Exception as exc:
             messagebox.showerror(APP_NAME, str(exc))
 
+    def resolve_command(self, cmd: str, mapping) -> str | None:
+        if not mapping:
+            return None
+        resolved = cmd
+        for key, value in mapping.items():
+            if isinstance(value, str):
+                resolved = resolved.replace("{" + key + "}", value)
+        if "{pin}" in resolved and isinstance(mapping.get("pins"), list) and mapping["pins"]:
+            resolved = resolved.replace("{pin}", mapping["pins"][0])
+        if "{" in resolved or "}" in resolved:
+            return None
+        return resolved
+
     def run_selected_module(self):
         m = self.selected_module()
         if not m:
             messagebox.showwarning(APP_NAME, "Sélectionnez un module.")
             return
+        stage, mapping = self.module_mapping(m["id"])
         self.write_log("=== " + m["name"] + " ===")
-        self.write_log("Les commandes contenant {pin}, {pin1} ou {pin2} doivent être câblées/paramétrées dans la prochaine itération.")
-        for cmd in m.get("commands", []):
-            if "{" in cmd:
-                self.write_log("À paramétrer : " + cmd)
+        if stage:
+            self.write_log("Étape de câblage : " + stage["name"])
+        if mapping:
+            self.write_log("Brochage : " + self.mapping_summary(mapping))
+        else:
+            self.write_log("Aucun mapping automatique : test manuel.")
+
+        for raw_cmd in m.get("commands", []):
+            cmd = self.resolve_command(raw_cmd, mapping)
+            if cmd is None:
+                self.write_log("À paramétrer : " + raw_cmd)
                 continue
             if cmd.startswith("WAIT "):
-                delay = int(cmd.split()[1]) / 1000
-                self.write_log(f"Attente {delay:.1f} s")
-                time.sleep(delay)
+                try:
+                    delay = int(cmd.split()[1]) / 1000
+                    self.write_log(f"Attente {delay:.1f} s")
+                    time.sleep(delay)
+                except ValueError:
+                    self.write_log("Commande WAIT invalide : " + cmd)
                 continue
             try:
                 response = self.agent.command(cmd)
@@ -314,11 +422,14 @@ class EmbedLabTester(tk.Tk):
         if not m:
             messagebox.showwarning(APP_NAME, "Sélectionnez un module.")
             return
+        stage, mapping = self.module_mapping(m["id"])
         self.results.append({
             "date": datetime.now().isoformat(timespec="seconds"),
             "microcontroleur": self.current_board()["name"],
             "port": self.port.get(),
+            "etape": stage["name"] if stage else "manuel",
             "module": m["name"],
+            "brochage": self.mapping_summary(mapping),
             "resultat": result,
             "note": m.get("fault_hint", "") if result == "DEFAUT" else "",
         })
