@@ -1,9 +1,9 @@
 {
   "source": "Figure 5 — vue rapprochée des connecteurs d'accès aux signaux",
-  "status": "draft_from_pcb_view",
+  "status": "updated_with_mosfet_j5",
   "notes": [
     "Ce fichier sert de référence de brochage pour l'outil de diagnostic.",
-    "La broche de commande MOSFET n'apparaît pas sur la vue rapprochée des headers bas ; elle reste à confirmer depuis le schéma ou le PCB."
+    "La broche de commande MOSFET est confirmée par l'utilisateur : MOSFET_Pin sur le connecteur J5."
   ],
   "left_header": {
     "top_row": [
@@ -97,11 +97,12 @@
       "Relais"
     ]
   },
-  "not_visible_on_figure": {
+  "separate_connectors": {
     "mosfet_command": {
-      "label": "MOSFET_CMD",
-      "status": "to_confirm",
-      "comment": "La commande MOSFET est présente sur la carte mais non visible sur cette vue de connecteurs. À renseigner avec le repère exact du schéma ou du PCB."
+      "connector": "J5",
+      "label": "MOSFET_Pin",
+      "status": "confirmed",
+      "usage": "Entrée de commande du module MOSFET pour charge DC externe."
     }
   }
 }
